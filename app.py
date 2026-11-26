@@ -1,8 +1,3 @@
-import streamlit as st
-import json
-import os
-
-FILE_NAME = "books.json"
 
 def load_books():
     if os.path.exists(FILE_NAME):
@@ -22,21 +17,17 @@ books = load_books()
 # 1. Добавяне на книга
 st.subheader("Добавяне на нова книга")
 with st.form("add_book_form", clear_on_submit=True):
-    col1, col2 = st.columns(2)
-    with col1:
-        title = st.text_input("Заглавие на книгата")
-    with col2:
-        author = st.text_input("Автор")
+    title = st.text_input("Заглавие на книгата")
     submitted = st.form_submit_button("Добави книга")
     
     if submitted:
-        if title.strip() and author.strip():
-            books.append({"title": title.strip(), "author": author.strip()})
+        if title.strip():
+            books.append(title.strip())
             save_books(books)
-            st.success(f"Книгата '{title}' беше добавена успешно!")
+            st.success(f"Книгата '{title.strip()}' беше добавена успешно!")
             st.rerun()
         else:
-            st.warning("Моля, въведете заглавие и автор.")
+            st.warning("Моля, въведете заглавие на книгата.")
 
 st.divider()
 
@@ -50,7 +41,7 @@ with col_sort:
     st.write("")
     st.write("")
     if st.button("Сортирай А-Я", use_container_width=True):
-        books.sort(key=lambda b: b["title"].lower())
+        books.sort(key=lambda b: b.lower())
         save_books(books)
         st.rerun()
 
@@ -63,7 +54,7 @@ st.divider()
 st.subheader("Списък с книги")
 
 filtered_books = [
-    b for b in books if search_query.strip().lower() in b["title"].lower()
+    b for b in books if search_query.strip().lower() in b.lower()
 ]
 
 if not filtered_books:
@@ -72,9 +63,9 @@ else:
     for idx, book in enumerate(filtered_books):
         col_info, col_del = st.columns([4, 1])
         with col_info:
-            st.write(f"**{book['title']}** — {book['author']}")
+            st.write(f"**{book}**")
         with col_del:
-            if st.button("Изтрий", key=f"del_{idx}_{book['title']}"):
+            if st.button("Изтрий", key=f"del_{idx}_{book}"):
                 books.remove(book)
                 save_books(books)
                 st.rerun()
